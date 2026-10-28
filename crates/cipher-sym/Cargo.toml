@@ -1,0 +1,19 @@
+[package]
+name = "cipher-sym"
+description = "Symmetric ciphers (AES, SM4) in GCM / CBC / CTR modes"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+cipher-core.workspace = true
+aes = { workspace = true, features = ["zeroize"] }
+sm4 = { workspace = true, features = ["zeroize"] }
+aes-gcm.workspace = true
+cbc.workspace = true
+ctr.workspace = true
+
+[dev-dependencies]
+hex-literal.workspace = true

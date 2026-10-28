@@ -1,0 +1,28 @@
+[build-system]
+requires = ["maturin>=1.9,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "cipher-algorithm"
+description = "Cryptographic algorithms (AES, SM4, ...) with a Rust core"
+readme = "../../README.md"
+requires-python = ">=3.8"
+dynamic = ["version"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Rust",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Topic :: Security :: Cryptography",
+]
+
+[project.optional-dependencies]
+test = ["pytest", "cryptography"]
+
+[tool.maturin]
+python-source = "python"
+module-name = "cipher_algorithm._native"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

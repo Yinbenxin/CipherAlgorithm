@@ -1,0 +1,63 @@
+name: wheels
+
+on:
+  push:
+    branches: [master]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, target: x86_64, manylinux: "2014", test: true }
+          - { os: ubuntu-24.04-arm, target: aarch64, manylinux: "2014", test: true }
+          - { os: macos-latest, target: aarch64, test: true }
+          # Cross-compiled from Apple Silicon; not executed in CI.
+          - { os: macos-latest, target: x86_64, test: false }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          manylinux: ${{ matrix.manylinux || 'auto' }}
+          args: --release -m bindings/python/Cargo.toml -o dist
+        env:
+          MACOSX_DEPLOYMENT_TARGET: "10.12"
+
+      - if: matrix.test
+        uses: astral-sh/setup-uv@v6
+
+      - if: matrix.test
+        name: test wheel on Python 3.8
+        run: |
+          uv venv -p 3.8 .venv-test
+          uv pip install -p .venv-test dist/*.whl pytest cryptography
+          .venv-test/bin/python -m pytest bindings/python/tests -q -rs -W ignore::DeprecationWarning
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ runner.os }}-${{ matrix.target }}
+          path: dist/*.whl
+
+  sdist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: -m bindings/python/Cargo.toml -o dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz

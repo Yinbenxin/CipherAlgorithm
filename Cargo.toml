@@ -1,0 +1,25 @@
+[workspace]
+resolver = "2"
+members = ["crates/cipher-core", "crates/cipher-sym", "bindings/python"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.89"
+repository = "https://github.com/Yinbenxin/CipherAlgorithm"
+
+[workspace.dependencies]
+cipher-core = { path = "crates/cipher-core" }
+cipher-sym = { path = "crates/cipher-sym" }
+
+aes = "=0.9.3"
+sm4 = "=0.6.0"
+aes-gcm = { version = "=0.11.1", default-features = false, features = ["alloc", "zeroize"] }
+cbc = { version = "=0.2.1", features = ["alloc", "zeroize"] }
+ctr = { version = "=0.10.1", features = ["zeroize"] }
+pyo3 = "=0.29.3"  # last release supporting Python 3.8 (abi3-py38)
+hex-literal = "=1.1.0"
+
+[profile.release]
+lto = true
+codegen-units = 1
